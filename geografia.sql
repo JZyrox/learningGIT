@@ -1,10 +1,6 @@
--- Creación de la base de datos
 CREATE DATABASE geografia_db;
-
--- Conexión a la base de datos creada
 \c geografia_db;
 
--- Creación de la tabla para almacenar palabras clave relacionadas con Geografía
 CREATE TABLE palabras_clave (
     id SERIAL PRIMARY KEY,
     palabra VARCHAR(50) NOT NULL,
@@ -12,7 +8,6 @@ CREATE TABLE palabras_clave (
     sinonimos TEXT
 );
 
--- Inserción de datos en la tabla palabras_clave
 INSERT INTO palabras_clave (palabra, porcentaje_identidad, sinonimos) VALUES
 ('Mapa', 95.00, 'cartografía, plano, croquis'),
 ('Territorio', 90.00, 'región, zona, área'),
