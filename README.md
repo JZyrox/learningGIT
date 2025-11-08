@@ -1,188 +1,115 @@
-# Design Document
+Design Document
 
-**Proyecto:** Análisis de Texto Geográfico
-**Autor:** Daniela Hernández
-**Versión:** 1.1
-**Fecha:** 6 de noviembre de 2025
+Proyecto: Análisis de Texto Geográfico
+Autor: Daniela Hernández
+Versión: 1.0
+Fecha: 8 de noviembre de 2025
 
----
+1. Propósito del proyecto
 
-## 1. Propósito del proyecto
+El objetivo de este proyecto es proporcionar la base de datos y el texto fuente utilizados en un análisis geográfico.
+Los archivos incluidos permiten crear una base de datos en PostgreSQL con términos relacionados con la geografía y un texto de ejemplo para futuras pruebas o análisis semánticos.
 
-El objetivo del sistema es **analizar un párrafo de texto**, eliminar palabras no relevantes (conectores) y **detectar términos geográficos clave** comparándolos con una base de datos PostgreSQL.
-El programa muestra coincidencias con sus respectivos porcentajes de identidad y sinónimos, permitiendo identificar conceptos importantes en textos relacionados con geografía.
+2. Alcance
 
----
+El contenido del proyecto está diseñado como base para prácticas o proyectos educativos enfocados en el procesamiento de lenguaje natural (NLP) o análisis de textos geográficos.
+Puede utilizarse en aplicaciones que requieran la detección de palabras clave relacionadas con la geografía o el medio ambiente.
 
-## 2. Alcance
+3. Arquitectura general
+   3.1 Diagrama conceptual
+   +----------------+ +---------------------+
+   | parrafo.txt | ---> | PostgreSQL Database |
+   | (texto fuente) | | (palabras_clave) |
+   +----------------+ +---------------------+
 
-El proyecto está pensado para ser una herramienta de análisis básico en el área educativa o de investigación.
-Puede integrarse en plataformas que necesiten **procesamiento de texto semántico** para temas geográficos o lingüísticos.
+El archivo parrafo.txt sirve como entrada textual, mientras que geografia.sql define la estructura de la base de datos y los términos de referencia
 
----
+4. Estructura del proyecto
 
-## 3. Arquitectura general
-
-### 3.1 Diagrama conceptual
-
-```
-+----------------+       +-------------------+       +---------------------+
-|  parrafo.txt   | --->  | Procesamiento de  | --->  | PostgreSQL Database |
-| (texto fuente) |       | texto en Python   |       | (palabras_clave)    |
-+----------------+       +-------------------+       +---------------------+
-         |                          |
-         v                          v
-  conectores.txt              Resultados mostrados
-  (palabras irrelevantes)     en consola
-```
-
----
-
-## 4. Estructura del proyecto
-
-El repositorio cuenta con los siguientes archivos dentro de la carpeta **BASEDATOS/**:
-
-```
 BASEDATOS/
 │
-├── conectores.txt        # Lista de conectores a eliminar del texto
-├── filtrar_palabras.py   # Script principal en Python
-├── geografia.sql         # Script SQL para crear la base de datos y tabla
-├── parrafo.txt           # Párrafo a analizar
-├── README.md             # Documentación general del proyecto
-└── .venv/                # Entorno virtual (dependencias locales)
-```
+├── geografia.sql # Script SQL que crea la base de datos y tabla de palabras clave
+├── parrafo.txt # Texto descriptivo geográfico a analizar
+└── .venv/ # Entorno virtual (dependencias locales de Python)
 
-Esta estructura facilita mantener separado el código, los datos de entrada y los scripts de configuración de base de datos.
+5. Componentes principales
+   5.1 Archivo SQL – geografia.sql
 
----
+Nombre de la base de datos: geografia_db
+Tabla: palabras_clave
 
-## 5. Componentes principales
+| Campo                | Tipo de dato       | Descripción                                 |
+| -------------------- | ------------------ | ------------------------------------------- |
+| id                   | SERIAL PRIMARY KEY | Identificador único                         |
+| palabra              | VARCHAR(50)        | Término geográfico clave                    |
+| porcentaje_identidad | DECIMAL(5,2)       | Grado de relevancia o similitud             |
+| sinonimos            | TEXT               | Lista de sinónimos o conceptos relacionados |
 
-### 5.1 Archivos externos
+Ejemplo de registros incluidos:
 
-- **conectores.txt:** Lista de palabras comunes (como "y", "pero", "además") que serán filtradas.
-- **parrafo.txt:** Texto a analizar.
-
-### 5.2 Base de datos (PostgreSQL)
-
-**Nombre:** `geografia_db`
-**Tabla:** `palabras_clave`
-
-| Campo                | Tipo de dato       | Descripción                                |
-| -------------------- | ------------------ | ------------------------------------------ |
-| id                   | SERIAL PRIMARY KEY | Identificador único                        |
-| palabra              | VARCHAR(50)        | Palabra clave                              |
-| porcentaje_identidad | DECIMAL(5,2)       | Grado de similitud o relevancia            |
-| sinonimos            | TEXT               | Lista de sinónimos o términos relacionados |
-
-Ejemplo de registro:
-
-```
 ('Mapa', 95.00, 'cartografía, plano, croquis')
-```
+('Territorio', 90.00, 'región, zona, área')
+('Clima', 92.50, 'meteorología, tiempo atmosférico')
+('País', 94.00, 'nación, estado, territorio')
 
----
+Este script permite crear y poblar automáticamente la tabla con términos geográficos relevantes.
 
-## 6. Flujo del programa
+5.2 Archivo de texto – parrafo.txt
 
-1. **Conexión:**
-   El script se conecta a la base de datos PostgreSQL usando `psycopg2`.
+Contenido:
+El mapa del territorio mexicano muestra el relieve y el clima de cada región.
+Este mapa ayuda a comprender cómo el clima influye en la población y los recursos naturales del país.
+En todo el territorio, el relieve determina las actividades humanas, mientras que el clima afecta los ecosistemas presentes en cada región del país.
 
-2. **Carga de archivos:**
+Este texto sirve como entrada de prueba para realizar análisis de coincidencia o extracción de palabras clave utilizando la base de datos creada por geografia.sql.
 
-   - Lee `conectores.txt` para obtener las palabras a eliminar.
-   - Lee `parrafo.txt` para extraer el texto que se analizará.
+6. Flujo básico de uso
 
-3. **Preprocesamiento del texto:**
+1.Crear la base de datos en PostgreSQL:
+\i geografia.sql
 
-   - Limpieza de signos de puntuación.
-   - Conversión a minúsculas.
-   - Separación por palabras.
-   - Eliminación de conectores.
+2.Leer el texto del archivo parrafo.txt.
 
-4. **Búsqueda en base de datos:**
-   Para cada palabra filtrada:
+3.Comparar palabras clave:
+Un script (no incluido en esta versión) podría analizar el texto, eliminar conectores y buscar coincidencias exactas en la tabla palabras_clave.
 
-   - Se busca una coincidencia exacta (`LOWER(palabra) = %s`).
-   - Si se encuentra, se muestran el porcentaje y los sinónimos.
-   - Si no, se indica que no hay coincidencia.
+4.Mostrar resultados:
+Se pueden listar las palabras encontradas junto con su porcentaje de identidad y sinónimos.
 
-5. **Cierre:**
-   Se cierra la conexión a la base de datos.
+7. Ejemplo de coincidencias esperadas
+   Del texto incluido, se podrían detectar las siguientes palabras en la base de datos:
+   | Palabra detectada | Porcentaje | Sinónimos |
+   | ----------------- | ---------- | -------------------------------- |
+   | Mapa | 95.00% | cartografía, plano, croquis |
+   | Territorio | 90.00% | región, zona, área |
+   | Clima | 92.50% | meteorología, tiempo atmosférico |
+   | Relieve | 88.00% | topografía, orografía |
+   | País | 94.00% | nación, estado, territorio |
+   | Región | 87.00% | zona, área geográfica |
 
----
+8. Requisitos técnicos
 
-## 7. Ejemplo de ejecución
+Software
 
-### Archivos:
+- PostgreSQL 14 o superior
+- (Opcional) Python 3.12+ si se desea automatizar el análisis
 
-**parrafo.txt**
+Dependencias sugeridas
 
-```
-El mapa del territorio muestra el relieve y los recursos naturales del país.
-```
+Si se emplea Python:
+pip install psycopg2 pandas
 
-**conectores.txt**
+9. Posibles mejoras futuras
 
-```
-el
-del
-y
-los
-de
-```
+Agregar un script en Python para automatizar el análisis de coincidencias.
 
-### Salida esperada:
+Implementar una interfaz web (por ejemplo, con Streamlit).
 
-```
-Palabras importantes detectadas:
-['mapa', 'territorio', 'muestra', 'relieve', 'recursos', 'naturales', 'país']
+Incorporar más términos geográficos o científicos en la base de datos.
 
-Coincidencias encontradas en la base de datos:
+Aplicar análisis semántico mediante NLP.
 
-Palabra: Mapa | Identidad: 95.0% | Sinónimos: cartografía, plano, croquis
-Palabra: Territorio | Identidad: 90.0% | Sinónimos: región, zona, área
-Palabra: Relieve | Identidad: 88.0% | Sinónimos: topografía, orografía
-Palabra: País | Identidad: 94.0% | Sinónimos: nación, estado, territorio
-'recursos' no se encontró en la base de datos.
-```
+10. Autoría
 
----
-
-## 8. Requisitos técnicos
-
-### Software
-
-- Python 3.12+
-- PostgreSQL 14+
-- Librería `psycopg2`
-
-### Archivos requeridos
-
-- `conectores.txt`
-- `parrafo.txt`
-
-### Dependencias
-
-Instalación de librería:
-
-```
-pip install psycopg2
-```
-
----
-
-## 9. Posibles mejoras futuras
-
-- Implementar coincidencias por similitud (usando `LIKE`, `LEVENSHTEIN`, o librerías NLP).
-- Crear una interfaz web con Streamlit para subir archivos y mostrar resultados visualmente.
-- Agregar soporte para más bases temáticas (historia, biología, etc.).
-- Guardar resultados en una nueva tabla de análisis.
-
----
-
-## 10. Autoría
-
-Desarrollado por **Daniela Hernández**
+Desarrollado por Daniela Hernández
 Proyecto académico – Curso de Programación Lógica (7º semestre)

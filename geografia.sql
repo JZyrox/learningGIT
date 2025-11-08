@@ -1,6 +1,8 @@
 CREATE DATABASE geografia_db;
 \c geografia_db;
 
+DROP TABLE IF EXISTS palabras_clave;
+
 CREATE TABLE palabras_clave (
     id SERIAL PRIMARY KEY,
     palabra VARCHAR(50) NOT NULL,
